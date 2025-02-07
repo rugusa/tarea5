@@ -1,4 +1,4 @@
-name: CI/CD Pipeline for ejercicio calculadora ampliada - Tema 5
+name: CI/CD Pipeline for HolaMundoMultilenguaje
 
 on:
   push:
@@ -36,7 +36,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
-
+      
       - name: Install dependencies
         run: composer install
 
@@ -46,16 +46,17 @@ jobs:
           HOST: ${{ secrets.HOST }}
           USERNAME: ${{ secrets.USERNAME }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
           # Use SSH to create the deploy path if it doesn't exist
           ssh -o StrictHostKeyChecking=no $USERNAME@$HOST "mkdir -p $DEPLOY_PATH"
 
           # Sync the application files to the server
-          rsync -avz --delete --no-t --exclude 'vendor' --exclude '.git' .$USERNAME@$HOST:$DEPLOY_PATH
+          rsync -avz --delete --no-t --exclude 'tests' --exclude '.git' . $USERNAME@$HOST:$DEPLOY_PATH
 
           # Optionally, run Composer install on the server
           ssh -o StrictHostKeyChecking=no $USERNAME@$HOST "cd $DEPLOY_PATH && composer install --no-dev --optimize-autoloader"
