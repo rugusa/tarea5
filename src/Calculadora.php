@@ -1,6 +1,7 @@
 <?php
 
 namespace App;
+echo('Hola');
 
 class Calculadora{
     public function suma($a, $b) {
